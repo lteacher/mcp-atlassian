@@ -100,6 +100,7 @@ class JiraConfig:
     username: str | None = None  # Email or username (Cloud)
     api_token: str | None = None  # API token (Cloud)
     personal_token: str | None = None  # Personal access token (Server/DC)
+    cloud_id: str | None = None  # Cloud ID for API gateway URL (Cloud)
     oauth_config: OAuthConfig | BYOAccessTokenOAuthConfig | None = None
     ssl_verify: bool = True  # Whether to verify SSL certificates
     projects_filter: str | None = None  # List of project keys to filter searches
@@ -204,6 +205,9 @@ class JiraConfig:
         # Get the projects filter if provided
         projects_filter = os.getenv("JIRA_PROJECTS_FILTER")
 
+        # Cloud ID for API gateway URL (Cloud only)
+        cloud_id = os.getenv("JIRA_CLOUD_ID")
+
         # Proxy settings
         http_proxy = os.getenv("JIRA_HTTP_PROXY", os.getenv("HTTP_PROXY"))
         https_proxy = os.getenv("JIRA_HTTPS_PROXY", os.getenv("HTTPS_PROXY"))
@@ -229,6 +233,7 @@ class JiraConfig:
             username=username,
             api_token=api_token,
             personal_token=personal_token,
+            cloud_id=cloud_id,
             oauth_config=oauth_config,
             ssl_verify=ssl_verify,
             projects_filter=projects_filter,

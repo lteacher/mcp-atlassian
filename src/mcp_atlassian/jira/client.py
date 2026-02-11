@@ -84,19 +84,36 @@ class JiraClient:
                 verify_ssl=self.config.ssl_verify,
             )
         else:  # basic auth
-            logger.debug(
-                f"Initializing Jira client with Basic auth. "
-                f"URL: {self.config.url}, Username: {self.config.username}, "
-                f"API Token present: {bool(self.config.api_token)}, "
-                f"Is Cloud: {self.config.is_cloud}"
-            )
-            self.jira = Jira(
-                url=self.config.url,
-                username=self.config.username,
-                password=self.config.api_token,
-                cloud=self.config.is_cloud,
-                verify_ssl=self.config.ssl_verify,
-            )
+            # Use API gateway URL if cloud_id is provided (for Cloud instances)
+            if self.config.cloud_id and self.config.is_cloud:
+                api_url = f"https://api.atlassian.com/ex/jira/{self.config.cloud_id}"
+                logger.debug(
+                    f"Initializing Jira client with Basic auth using Cloud ID. "
+                    f"URL: {api_url}, Username: {self.config.username}, "
+                    f"API Token present: {bool(self.config.api_token)}, "
+                    f"Cloud ID: {self.config.cloud_id}"
+                )
+                self.jira = Jira(
+                    url=api_url,
+                    username=self.config.username,
+                    password=self.config.api_token,
+                    cloud=True,
+                    verify_ssl=self.config.ssl_verify,
+                )
+            else:
+                logger.debug(
+                    f"Initializing Jira client with Basic auth. "
+                    f"URL: {self.config.url}, Username: {self.config.username}, "
+                    f"API Token present: {bool(self.config.api_token)}, "
+                    f"Is Cloud: {self.config.is_cloud}"
+                )
+                self.jira = Jira(
+                    url=self.config.url,
+                    username=self.config.username,
+                    password=self.config.api_token,
+                    cloud=self.config.is_cloud,
+                    verify_ssl=self.config.ssl_verify,
+                )
             logger.debug(
                 f"Jira client initialized. Session headers (Authorization masked): "
                 f"{get_masked_session_headers(dict(self.jira._session.headers))}"
